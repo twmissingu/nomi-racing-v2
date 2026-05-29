@@ -148,6 +148,7 @@ func check_race_complete(finish_position: int, total_races: int) -> void:
 		unlock("niwu_changke")
 	if finish_position <= 3:
 		_podium_count += 1
+		_save_achievements()
 		if _podium_count >= 20:
 			unlock("podium_master")
 
