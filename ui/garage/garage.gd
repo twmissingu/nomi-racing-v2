@@ -375,7 +375,7 @@ func _on_action() -> void:
 			SaveManager.select_car(selected_index)
 			_refresh_cards()
 			_select_car(selected_index)
-				AchievementManager.check_nio_collection(SaveManager.profile.owned_cars)
+			AchievementManager.check_nio_collection(SaveManager.profile.owned_cars)
 
 func _refresh_cards() -> void:
 	# Rebuild card text to reflect ownership changes
