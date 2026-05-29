@@ -3,6 +3,9 @@ extends RefCounted
 ## Trophy truck mesh builder — raised truck body, wide fenders, roll cage, front bumper guard.
 
 static func build(body_mesh: Node3D, car_data: Resource, wheels: Array) -> StandardMaterial3D:
+	# Clear any existing mesh children
+	for child in parent.get_children():
+		child.queue_free()
 	var w: float = car_data.body_width
 	var l: float = car_data.body_length
 	var h: float = car_data.body_height

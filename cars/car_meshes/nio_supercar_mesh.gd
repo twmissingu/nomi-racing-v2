@@ -3,6 +3,9 @@ extends RefCounted
 ## Procedural CSG mesh builder for NIO EP9 electric supercar.
 
 static func build(parent: Node3D, car_data: Resource, wheels: Array) -> StandardMaterial3D:
+	# Clear any existing mesh children
+	for child in parent.get_children():
+		child.queue_free()
 	var body_color: Color = car_data.body_color
 
 	# --- Main body (low, wide, aggressive) ---
