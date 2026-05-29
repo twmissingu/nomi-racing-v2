@@ -192,6 +192,11 @@ func show_results(car: Node, finish_position: int = 1) -> void:
 	}
 	SaveManager.record_race_result(result_dict)
 
+	# Check achievements
+	var total_races: int = SaveManager.profile.race_history.size()
+	AchievementManager.check_race_complete(finish_position, total_races)
+	AchievementManager.check_speed(car.current_speed_kph if "current_speed_kph" in car else 0.0)
+
 	# Season mode: show standings button (positions recorded later when race fully ends)
 	if GameManager.season_active and season_standings_btn:
 		season_standings_btn.visible = true

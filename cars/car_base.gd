@@ -23,6 +23,7 @@ var is_drifting: bool = false
 var drift_timer: float = 0.0
 var drift_recovery_timer: float = 0.0
 var stuck_timer: float = 0.0
+var _speed_check_timer: float = 0.0
 var throttle_input: float = 0.0
 var brake_input: float = 0.0
 var steering_input: float = 0.0
@@ -158,6 +159,15 @@ func _physics_process(delta: float) -> void:
 	_check_stuck(delta)
 	_update_brake_lights()
 	_update_particles()
+
+	# Check speed achievement (throttled to once per second)
+	if current_speed_kph >= 300.0:
+		_speed_check_timer += delta
+		if _speed_check_timer >= 1.0:
+			_speed_check_timer = 0.0
+			AchievementManager.check_speed(current_speed_kph)
+	else:
+		_speed_check_timer = 0.0
 
 func _update_reverse_state() -> void:
 	var local_vel: Vector3 = global_transform.basis.inverse() * linear_velocity
