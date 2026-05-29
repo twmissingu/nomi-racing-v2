@@ -150,9 +150,16 @@ func _update_expression_visual() -> void:
 	elif eye_state.shape == "narrow":
 		eye_left.size = Vector2(14, 10)
 		eye_right.size = Vector2(14, 10)
+	elif eye_state.shape == "happy":
+		eye_left.size = Vector2(14, 8)
+		eye_right.size = Vector2(14, 8)
 	else:
 		eye_left.size = Vector2(12, 16)
 		eye_right.size = Vector2(12, 16)
+
+	# Update blink behavior based on expression
+	if "blink" in eye_state:
+		blink_interval = 2.0 if eye_state.blink else 5.0
 
 	# Update mouth shape
 	var mouth_state: Dictionary = NOMIExpressions.get_mouth_state(current_expression)
