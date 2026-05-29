@@ -27,7 +27,8 @@ func _ready() -> void:
 	ui_layer.layer = 10
 	add_child(ui_layer)
 	_build_ui()
-	_select_track(mode_track_indices[0])
+	if mode_track_indices.size() > 0:
+		_select_track(mode_track_indices[0])
 
 func _build_ui() -> void:
 	var bg := ColorRect.new()
