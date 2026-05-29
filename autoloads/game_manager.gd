@@ -220,6 +220,7 @@ func _driver_key(car_idx: int, slot: int) -> String:
 	return "%d_%d" % [car_idx, slot]
 
 func start_season(player_car_idx: int) -> void:
+	split_screen = false
 	season_active = true
 	season_current_round = 0
 	season_mode = racing_mode
@@ -433,6 +434,7 @@ func transition_to_scene(path: String) -> void:
 
 func go_to_main_menu() -> void:
 	Engine.time_scale = 1.0
+	split_screen = false
 	RaceManager.reset()
 	get_tree().paused = false
 	state = GameState.MENU
