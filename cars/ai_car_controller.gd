@@ -77,7 +77,7 @@ func _physics_process(delta: float) -> void:
 		car.set_inputs(0.0, 0.0, 0.0, false)
 		return
 	if RaceManager.car_finished.get(car, false):
-		car.set_inputs(0.0, 1.0, 0.0, false)
+		car.set_inputs(0.0, 0.0, 0.0, false)
 		return
 
 	_update_rubber_banding(delta)

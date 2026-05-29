@@ -143,7 +143,8 @@ func _physics_process(delta: float) -> void:
 	if not car_data:
 		return
 
-	current_speed_kph = linear_velocity.length() * 3.6
+	var local_vel: Vector3 = global_transform.basis.inverse() * linear_velocity
+	current_speed_kph = absf(-local_vel.z) * 3.6
 	var speed_ratio: float = current_speed_kph / car_data.max_speed_kph
 
 	_update_reverse_state()
@@ -266,10 +267,12 @@ func _apply_weight_transfer() -> void:
 		if not handbrake_input:
 			wheel_rl.wheel_friction_slip = car_data.normal_friction_slip - transfer
 			wheel_rr.wheel_friction_slip = car_data.normal_friction_slip - transfer
-	elif not is_drifting and not handbrake_input:
-		var all_wheels: Array = [wheel_fl, wheel_fr, wheel_rl, wheel_rr]
-		for w in all_wheels:
-			w.wheel_friction_slip = car_data.normal_friction_slip
+	else:
+		wheel_fl.wheel_friction_slip = car_data.normal_friction_slip
+		wheel_fr.wheel_friction_slip = car_data.normal_friction_slip
+		if not is_drifting and not handbrake_input:
+			wheel_rl.wheel_friction_slip = car_data.normal_friction_slip
+			wheel_rr.wheel_friction_slip = car_data.normal_friction_slip
 
 func _update_drift_state(delta: float) -> void:
 	var local_vel: Vector3 = global_transform.basis.inverse() * linear_velocity
@@ -320,10 +323,13 @@ func _apply_anti_flip(delta: float) -> void:
 		var up: Vector3 = global_transform.basis.y
 		var target_up: Vector3 = Vector3.UP
 		var correction: Vector3 = up.cross(target_up)
-		apply_torque(correction * mass * 5.0 * delta * 120.0)
+		apply_torque(correction * mass * 5.0)
 		angular_velocity = angular_velocity.lerp(Vector3.ZERO, 2.0 * delta)
 
 func _check_stuck(delta: float) -> void:
+	if RaceManager.car_finished.get(self, false):
+		stuck_timer = 0.0
+		return
 	if current_speed_kph < 2.0 and (throttle_input > 0.2 or brake_input > 0.2):
 		stuck_timer += delta
 	else:
@@ -408,7 +414,8 @@ func _build_car_mesh() -> void:
 func _update_brake_lights() -> void:
 	if not _taillight_material:
 		return
-	var target_energy: float = lerpf(1.5, 4.0, brake_input)
+	var brake_amount: float = maxf(brake_input, 0.3 if handbrake_input else 0.0)
+	var target_energy: float = lerpf(1.5, 4.0, brake_amount)
 	_taillight_material.emission_energy_multiplier = target_energy
 
 func _setup_particles() -> void:
