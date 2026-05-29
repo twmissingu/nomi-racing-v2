@@ -176,6 +176,10 @@ func _on_commentary_requested(text: String, duration: float) -> void:
 	if not speech_bubble or not speech_label:
 		return
 
+	# Kill any in-flight commentary tween
+	if speech_tween and speech_tween.is_valid():
+		speech_tween.kill()
+
 	speech_label.text = text
 	speech_bubble.visible = true
 
@@ -188,10 +192,10 @@ func _on_commentary_requested(text: String, duration: float) -> void:
 
 	# Fade in
 	speech_bubble.modulate.a = 0.0
-	var tween := create_tween()
-	tween.tween_property(speech_bubble, "modulate:a", 1.0, 0.2)
+	speech_tween = create_tween()
+	speech_tween.tween_property(speech_bubble, "modulate:a", 1.0, 0.2)
 
 	# Fade out after duration
-	tween.tween_interval(duration)
-	tween.tween_property(speech_bubble, "modulate:a", 0.0, 0.3)
-	tween.tween_callback(func(): speech_bubble.visible = false)
+	speech_tween.tween_interval(duration)
+	speech_tween.tween_property(speech_bubble, "modulate:a", 0.0, 0.3)
+	speech_tween.tween_callback(func(): speech_bubble.visible = false)
