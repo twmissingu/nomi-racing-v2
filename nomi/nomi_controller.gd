@@ -181,12 +181,12 @@ func celebrate_podium() -> void:
 	commentary_requested.emit(NOMICommentary.get_podium_comment(), 4.0)
 
 func react_to_collision() -> void:
+	collision_count += 1
 	if comment_cooldown > 0.0:
 		return
 	comment_cooldown = COMMENT_COOLDOWN
 	_change_state(NOMIState.COMMENTING)
 	expression_changed.emit("surprised")
-	collision_count += 1
 	commentary_requested.emit(NOMICommentary.get_collision_comment(), 2.0)
 
 func get_collision_count() -> int:
