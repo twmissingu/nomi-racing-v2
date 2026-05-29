@@ -193,7 +193,7 @@ func show_results(car: Node, finish_position: int = 1) -> void:
 	SaveManager.record_race_result(result_dict)
 
 	# Check achievements
-	var total_races: int = SaveManager.profile.race_history.size()
+	var total_races: int = SaveManager.profile.race_results.size()
 	AchievementManager.check_race_complete(finish_position, total_races)
 	AchievementManager.check_speed(car.current_speed_kph if "current_speed_kph" in car else 0.0)
 	# Perfect race: win without collisions
