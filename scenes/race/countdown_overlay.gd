@@ -82,9 +82,11 @@ func _on_countdown_tick(number: int) -> void:
 func _on_standard_tick(number: int) -> void:
 	if number > 0:
 		_show_number(str(number), TEXT_PRIMARY, 200)
+		SoundManager.play_countdown_tick()
 	else:
 		_show_number("GO!", SUCCESS, 250)
 		_flash_screen()
+		SoundManager.play_countdown_go()
 
 func _on_f1_tick(number: int) -> void:
 	if number > 0:
@@ -95,12 +97,14 @@ func _on_f1_tick(number: int) -> void:
 			# Pulse animation
 			var tween := create_tween()
 			tween.tween_property(light_rects[light_index], "color", F1_RED, 0.05)
+		SoundManager.play_countdown_tick()
 	else:
 		# LIGHTS OUT — all lights go dark
 		for light in light_rects:
 			light.color = F1_RED_OFF
 		_show_number("LIGHTS OUT AND AWAY WE GO!", SUCCESS, 60)
 		_flash_screen()
+		SoundManager.play_countdown_go()
 		# Fade out the lights panel after a moment
 		var fade_tween := create_tween()
 		fade_tween.tween_interval(1.5)

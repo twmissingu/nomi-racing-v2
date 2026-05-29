@@ -196,9 +196,11 @@ func show_results(car: Node, finish_position: int = 1) -> void:
 	if GameManager.season_active and season_standings_btn:
 		season_standings_btn.visible = true
 
-	# Confetti for 1st place
-	if finish_position == 1 and confetti:
-		confetti.emitting = true
+	# Confetti and fanfare for 1st place
+	if finish_position == 1:
+		if confetti:
+			confetti.emitting = true
+		SoundManager.play_victory_fanfare()
 
 	# Slide up animation
 	container.position.y = 1080

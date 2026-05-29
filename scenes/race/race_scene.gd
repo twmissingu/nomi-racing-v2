@@ -26,6 +26,8 @@ func _ready() -> void:
 		RaceManager.race_finished.disconnect(_on_race_finished)
 	if RaceManager.race_state_changed.is_connected(_on_race_state_changed):
 		RaceManager.race_state_changed.disconnect(_on_race_state_changed)
+	if RaceManager.lap_completed.is_connected(_on_lap_completed):
+		RaceManager.lap_completed.disconnect(_on_lap_completed)
 	_load_track()
 	_spawn_player()
 	_spawn_ai_cars()
@@ -59,6 +61,7 @@ func _ready() -> void:
 	# Connect race signals
 	RaceManager.race_finished.connect(_on_race_finished)
 	RaceManager.race_state_changed.connect(_on_race_state_changed)
+	RaceManager.lap_completed.connect(_on_lap_completed)
 
 	# Brief delay then start countdown
 	await get_tree().create_timer(0.5).timeout
@@ -251,6 +254,10 @@ func _toggle_pause() -> void:
 	is_paused = true
 
 var player_results_shown: bool = false
+
+func _on_lap_completed(car: Node, _lap: int) -> void:
+	if car == player_car:
+		SoundManager.play_lap_complete()
 
 func _on_race_finished(car: Node) -> void:
 	if car != player_car:

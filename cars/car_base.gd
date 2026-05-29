@@ -509,6 +509,8 @@ func _on_body_entered(body: Node) -> void:
 			_spark_particles.restart()
 			_spark_particles.emitting = true
 		collision_occurred.emit(current_speed_kph)
+		if current_speed_kph > 30.0:
+			SoundManager.play_collision()
 
 func _setup_engine_audio() -> void:
 	var stream := AudioStreamGenerator.new()
