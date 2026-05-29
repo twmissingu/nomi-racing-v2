@@ -96,7 +96,8 @@ func _on_f1_tick(number: int) -> void:
 			light_rects[light_index].color = F1_RED
 			# Pulse animation
 			var tween := create_tween()
-			tween.tween_property(light_rects[light_index], "color", F1_RED, 0.05)
+			tween.tween_property(light_rects[light_index], "color", Color(1.0, 0.3, 0.3), 0.05)
+			tween.tween_property(light_rects[light_index], "color", F1_RED, 0.15)
 		SoundManager.play_countdown_tick()
 	else:
 		# LIGHTS OUT — all lights go dark

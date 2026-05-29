@@ -106,7 +106,7 @@ func _build_ui() -> void:
 	# Buttons
 	var btn_box := HBoxContainer.new()
 	btn_box.position = Vector2(510, 570)
-	btn_box.size = Vector2(900, 60)
+	btn_box.size = Vector2(1100, 60)
 	btn_box.add_theme_constant_override("separation", 30)
 	container.add_child(btn_box)
 

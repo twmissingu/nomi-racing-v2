@@ -191,7 +191,7 @@ func _select_track(index: int) -> void:
 	length_label.text = "LENGTH  %.1f km" % track_data.length_km
 
 func _on_back() -> void:
-	GameManager.transition_to_scene("res://scenes/main.tscn")
+	GameManager.transition_to_scene("res://ui/player_select/player_select.tscn")
 
 func _on_continue() -> void:
 	GameManager.transition_to_scene("res://ui/race_setup/race_setup.tscn")
