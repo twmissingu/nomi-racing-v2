@@ -58,7 +58,7 @@ func _physics_process(delta: float) -> void:
 
 	if is_looking_back:
 		desired_pos = target_pos + forward * look_back_distance + Vector3.UP * look_back_height
-		look_target = target_pos + forward * 10.0
+		look_target = target_pos - forward * 10.0
 	else:
 		desired_pos = target_pos - forward * follow_distance + Vector3.UP * follow_height
 		look_target = target_pos + forward * look_ahead
