@@ -46,7 +46,8 @@ func _build_avatar() -> void:
 	sb.content_margin_top = 8
 	sb.content_margin_bottom = 8
 	avatar_panel.add_theme_stylebox_override("panel", sb)
-	avatar_panel.position = Vector2(AVATAR_MARGIN, 1080 - AVATAR_SIZE - AVATAR_MARGIN)
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+	avatar_panel.position = Vector2(AVATAR_MARGIN, viewport_size.y - AVATAR_SIZE - AVATAR_MARGIN)
 	avatar_panel.size = Vector2(AVATAR_SIZE, AVATAR_SIZE)
 	add_child(avatar_panel)
 
@@ -98,7 +99,8 @@ func _build_speech_bubble() -> void:
 	sb.border_width_bottom = 2
 	sb.border_color = NIO_BLUE
 	speech_bubble.add_theme_stylebox_override("panel", sb)
-	speech_bubble.position = Vector2(AVATAR_SIZE + AVATAR_MARGIN + 8, 1080 - AVATAR_SIZE - AVATAR_MARGIN - 10)
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+	speech_bubble.position = Vector2(AVATAR_SIZE + AVATAR_MARGIN + 8, viewport_size.y - AVATAR_SIZE - AVATAR_MARGIN - 10)
 	speech_bubble.size = Vector2(BUBBLE_MAX_WIDTH, 60)
 	speech_bubble.visible = false
 	add_child(speech_bubble)
