@@ -1,7 +1,7 @@
 extends Node
 
 ## NOMI controller: state machine managing NOMI's behavior during races.
-## States: idle, navigating, commenting, celebrating
+## Uses NOMIExpressions for visual states and NOMICommentary for text.
 
 enum NOMIState { IDLE, NAVIGATING, COMMENTING, CELEBRATING }
 
@@ -15,19 +15,20 @@ var comment_cooldown: float = 0.0
 
 # Race data references
 var player_car: VehicleBody3D
-var race_manager: Node  # RaceManager autoload
+var race_manager: Node
 
 # Commentary triggers
 var last_position: int = 1
 var last_lap: int = 0
 var was_drifting: bool = false
-var near_miss_distance: float = 100.0
+var collision_count: int = 0
 
 # Configuration
-const COMMENT_COOLDOWN: float = 3.0
-const POSITION_CHANGE_COMMENT_CHANCE: float = 0.8
+const COMMENT_COOLDOWN: float = 3.5
+const POSITION_CHANGE_COMMENT_CHANCE: float = 0.85
 const LAP_COMMENT_CHANCE: float = 1.0
-const DRIFT_COMMENT_CHANCE: float = 0.5
+const DRIFT_COMMENT_CHANCE: float = 0.6
+const SPEED_COMMENT_CHANCE: float = 0.3
 
 func _ready() -> void:
 	race_manager = RaceManager
@@ -53,6 +54,10 @@ func start_race() -> void:
 	current_state = NOMIState.NAVIGATING
 	state_timer = 0.0
 	expression_changed.emit("happy")
+	# Race start comment
+	comment_cooldown = COMMENT_COOLDOWN
+	_change_state(NOMIState.COMMENTING)
+	commentary_requested.emit(NOMICommentary.get_race_start_comment(), 3.0)
 
 func _process_idle(_delta: float) -> void:
 	pass
@@ -65,8 +70,10 @@ func _process_navigating(_delta: float) -> void:
 	var current_pos: int = race_manager.get_car_position(player_car)
 	if current_pos != last_position:
 		if comment_cooldown <= 0.0 and randf() < POSITION_CHANGE_COMMENT_CHANCE:
-			var direction: String = "up" if current_pos < last_position else "down"
-			_comment_on_position_change(current_pos, direction)
+			if current_pos < last_position:
+				_comment_overtake(current_pos)
+			else:
+				_comment_overtaken(current_pos)
 		last_position = current_pos
 
 	# Check for lap completion
@@ -84,8 +91,12 @@ func _process_navigating(_delta: float) -> void:
 	elif not player_car.is_drifting:
 		was_drifting = false
 
+	# Check for high speed
+	if player_car.current_speed_kph > 250.0 and comment_cooldown <= 0.0:
+		if randf() < SPEED_COMMENT_CHANCE:
+			_comment_on_speed(player_car.current_speed_kph)
+
 func _process_commenting(_delta: float) -> void:
-	# Wait for commentary to finish
 	if state_timer > 3.0:
 		_change_state(NOMIState.NAVIGATING)
 
@@ -98,73 +109,61 @@ func _change_state(new_state: NOMIState) -> void:
 	state_timer = 0.0
 	state_changed.emit(new_state)
 
-func _comment_on_position_change(new_pos: int, direction: String) -> void:
+func _comment_overtake(new_pos: int) -> void:
 	comment_cooldown = COMMENT_COOLDOWN
 	_change_state(NOMIState.COMMENTING)
 
-	var text: String
-	if direction == "up":
-		match new_pos:
-			1:
-				text = "You're in the lead! Amazing driving!"
-				expression_changed.emit("celebrating")
-			2:
-				text = "Second place! Keep pushing!"
-				expression_changed.emit("happy")
-			3:
-				text = "Podium position! Great overtake!"
-				expression_changed.emit("happy")
-			_:
-				text = "Nice move! You're now P%d!" % new_pos
-				expression_changed.emit("happy")
+	if new_pos == 1:
+		expression_changed.emit("celebrating")
+		commentary_requested.emit("You're in the lead! " + NOMICommentary.get_overtake_comment(), 3.0)
 	else:
-		match new_pos:
-			1:
-				text = "Lost the lead... Let's get it back!"
-				expression_changed.emit("nervous")
-			_:
-				text = "Dropped to P%d. Stay focused!" % new_pos
-				expression_changed.emit("nervous")
+		expression_changed.emit("happy")
+		commentary_requested.emit(NOMICommentary.get_overtake_comment(), 3.0)
 
-	commentary_requested.emit(text, 3.0)
+func _comment_overtaken(new_pos: int) -> void:
+	comment_cooldown = COMMENT_COOLDOWN
+	_change_state(NOMIState.COMMENTING)
+
+	if new_pos == 1:
+		expression_changed.emit("nervous")
+		commentary_requested.emit(NOMICommentary.get_being_overtaken_comment(), 3.0)
+	else:
+		expression_changed.emit("nervous")
+		commentary_requested.emit(NOMICommentary.get_being_overtaken_comment(), 3.0)
 
 func _comment_on_lap(lap: int) -> void:
 	comment_cooldown = COMMENT_COOLDOWN
 	_change_state(NOMIState.COMMENTING)
 
 	var total_laps: int = race_manager.total_laps
-	var text: String
 	if lap >= total_laps:
-		text = "Final lap! Give it everything!"
 		expression_changed.emit("surprised")
-	elif lap == total_laps - 1:
-		text = "Last lap coming up! Stay sharp!"
-		expression_changed.emit("happy")
+		commentary_requested.emit(NOMICommentary.get_final_lap_comment(), 3.0)
 	else:
-		text = "Lap %d complete! Keep it up!" % lap
 		expression_changed.emit("happy")
-
-	commentary_requested.emit(text, 3.0)
+		commentary_requested.emit(NOMICommentary.get_lap_complete_comment(), 3.0)
 
 func _comment_on_drift() -> void:
 	comment_cooldown = COMMENT_COOLDOWN
 	_change_state(NOMIState.COMMENTING)
-
-	var drift_comments: Array[String] = [
-		"Nice drift!",
-		"Smooth slide!",
-		"That was beautiful!",
-		"Drift king!",
-		"Incredible control!",
-	]
-	var text: String = drift_comments[randi() % drift_comments.size()]
 	expression_changed.emit("happy")
-	commentary_requested.emit(text, 2.0)
+	commentary_requested.emit(NOMICommentary.get_drift_comment(), 2.0)
+
+func _comment_on_speed(speed_kph: float) -> void:
+	comment_cooldown = COMMENT_COOLDOWN * 2.0
+	_change_state(NOMIState.COMMENTING)
+	expression_changed.emit("surprised")
+	commentary_requested.emit(NOMICommentary.get_speed_comment() + " %d km/h!" % int(speed_kph), 3.0)
 
 func celebrate_victory() -> void:
 	_change_state(NOMIState.CELEBRATING)
 	expression_changed.emit("celebrating")
-	commentary_requested.emit("You did it! First place! Incredible race!", 5.0)
+	commentary_requested.emit(NOMICommentary.get_victory_comment(), 5.0)
+
+func celebrate_podium() -> void:
+	_change_state(NOMIState.CELEBRATING)
+	expression_changed.emit("celebrating")
+	commentary_requested.emit(NOMICommentary.get_podium_comment(), 4.0)
 
 func react_to_collision() -> void:
 	if comment_cooldown > 0.0:
@@ -172,11 +171,8 @@ func react_to_collision() -> void:
 	comment_cooldown = COMMENT_COOLDOWN
 	_change_state(NOMIState.COMMENTING)
 	expression_changed.emit("surprised")
-	commentary_requested.emit("Watch out! That was close!", 2.0)
+	collision_count += 1
+	commentary_requested.emit(NOMICommentary.get_collision_comment(), 2.0)
 
-func react_to_speed(speed_kph: float) -> void:
-	if speed_kph > 250.0 and comment_cooldown <= 0.0:
-		comment_cooldown = COMMENT_COOLDOWN * 2.0
-		_change_state(NOMIState.COMMENTING)
-		expression_changed.emit("surprised")
-		commentary_requested.emit("Wow! %d km/h! Incredible speed!" % int(speed_kph), 3.0)
+func get_collision_count() -> int:
+	return collision_count

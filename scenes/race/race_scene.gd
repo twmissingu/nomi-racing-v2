@@ -267,6 +267,8 @@ func _on_race_finished(car: Node) -> void:
 		var finish_pos: int = RaceManager.get_finish_position(player_car)
 		if finish_pos == 1:
 			nomi_controller.celebrate_victory()
+		elif finish_pos <= 3:
+			nomi_controller.celebrate_podium()
 
 func _on_race_state_changed(new_state: int) -> void:
 	if new_state == RaceManager.RaceState.FINISHED:

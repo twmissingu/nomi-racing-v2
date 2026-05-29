@@ -1,3 +1,4 @@
+class_name NOMICommentary
 extends RefCounted
 
 ## NOMI race commentary text generation.
