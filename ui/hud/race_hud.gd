@@ -330,9 +330,9 @@ func _update_speed() -> void:
 
 func _update_lap() -> void:
 	if RaceManager.is_point_to_point:
-		# Show checkpoint progress instead of laps
+		# Show checkpoint progress (intermediate CPs only, finish is implicit)
 		var cp_hit: int = _count_player_checkpoints()
-		var cp_total: int = RaceManager.num_checkpoints
+		var cp_total: int = RaceManager.num_checkpoints - 1
 		lap_label.text = "CP %d/%d" % [cp_hit, cp_total]
 	else:
 		var completed: int = RaceManager.get_car_lap(player_car)
