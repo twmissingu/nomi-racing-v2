@@ -402,8 +402,7 @@ func _setup_transition_layer() -> void:
 
 	_fade_rect = ColorRect.new()
 	_fade_rect.color = Color(0, 0, 0, 0)
-	_fade_rect.position = Vector2.ZERO
-	_fade_rect.size = Vector2(1920, 1080)
+	_fade_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_transition_layer.add_child(_fade_rect)
 
