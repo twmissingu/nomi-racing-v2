@@ -29,6 +29,7 @@ var registered_cars: Array = []
 var car_positions: Dictionary = {}
 var car_finished: Dictionary = {}
 var finish_order: Array = []
+var car_was_last: Dictionary = {}
 var finish_timeout: float = 0.0
 var finish_timeout_active: bool = false
 const FINISH_TIMEOUT_DURATION: float = 30.0
@@ -64,6 +65,7 @@ func setup_race(laps: int, checkpoints: int, point_to_point: bool = false) -> vo
 	car_positions.clear()
 	car_finished.clear()
 	finish_order.clear()
+	car_was_last.clear()
 	finish_timeout = 0.0
 	finish_timeout_active = false
 	position_update_timer = 0.0
@@ -92,6 +94,7 @@ func register_car(car: Node) -> void:
 	car_lap_times[car] = []
 	car_current_lap_start[car] = 0.0
 	car_finished[car] = false
+	car_was_last[car] = false
 	car_positions[car] = registered_cars.size()
 	var cp_flags: Array[bool] = []
 	if is_point_to_point:
@@ -250,8 +253,9 @@ func _finish_race_timeout() -> void:
 	)
 	for car in remaining:
 		_car_finish(car)
-	state = RaceState.FINISHED
-	race_state_changed.emit(RaceState.FINISHED)
+	if state != RaceState.FINISHED:
+		state = RaceState.FINISHED
+		race_state_changed.emit(RaceState.FINISHED)
 
 func _update_positions() -> void:
 	if registered_cars.is_empty():
@@ -279,6 +283,12 @@ func _update_positions() -> void:
 		car_positions[entry.car] = pos
 		pos += 1
 
+	# Track if any car was in last place (for comeback achievement)
+	if not progress_list.is_empty():
+		var last_car: Node = progress_list.back().car
+		if car_positions[last_car] >= registered_cars.size():
+			car_was_last[last_car] = true
+
 func _count_checkpoints_hit(car: Node) -> int:
 	var flags: Array = car_checkpoints.get(car, [])
 	var count: int = 0
@@ -301,7 +311,7 @@ func _get_track_fraction(car: Node) -> float:
 	return shifted
 
 func get_car_position(car: Node) -> int:
-	return car_positions.get(car, 1)
+	return car_positions.get(car, registered_cars.size())
 
 func get_car_lap(car: Node) -> int:
 	return car_laps.get(car, 0)
@@ -341,6 +351,7 @@ func reset() -> void:
 	car_positions.clear()
 	car_finished.clear()
 	finish_order.clear()
+	car_was_last.clear()
 	finish_timeout = 0.0
 	finish_timeout_active = false
 	position_update_timer = 0.0

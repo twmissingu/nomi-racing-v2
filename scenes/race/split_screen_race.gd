@@ -303,9 +303,36 @@ func _show_results_for_player(player_idx: int) -> void:
 		controller.set_physics_process(false)
 	car.set_inputs(0.0, 0.0, 0.0, false)
 
-	# Show results for the first player to finish
+	var finish_pos: int = RaceManager.get_finish_position(car)
+
+	# Always save results and check achievements for each player
+	_save_player_result(car, finish_pos)
+
+	# Show results UI only for the first player to finish
 	if not results_screen_shown:
 		results_screen_shown = true
 		_start_slow_motion()
-		var finish_pos: int = RaceManager.get_finish_position(car)
 		results_screen.show_results(car, finish_pos)
+
+func _save_player_result(car: Node, finish_pos: int) -> void:
+	var cred_index: int = clampi(finish_pos - 1, 0, 7)
+	var credits_by_pos: Array = [500, 300, 200, 150, 100, 75, 50, 25]
+	var credits_earned: int = credits_by_pos[cred_index]
+	SaveManager.add_credits(credits_earned)
+
+	var result_dict: Dictionary = {
+		"track_index": GameManager.selected_track_index,
+		"car_index": car.car_index,
+		"finish_position": finish_pos,
+		"total_cars": RaceManager.registered_cars.size(),
+		"total_time": RaceManager.race_time,
+		"best_lap_time": RaceManager.get_car_best_lap_time(car),
+		"credits_earned": credits_earned,
+		"laps": GameManager.race_laps,
+	}
+	SaveManager.record_race_result(result_dict)
+
+	var total_races: int = SaveManager.profile.race_results.size()
+	AchievementManager.check_race_complete(finish_pos, total_races)
+	AchievementManager.check_speed(car.current_speed_kph if "current_speed_kph" in car else 0.0)
+	AchievementManager.check_perfect_race(finish_pos, 0)

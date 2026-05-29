@@ -203,6 +203,11 @@ func show_results(car: Node, finish_position: int = 1) -> void:
 	elif get_parent().has_method("get_nomi_collision_count"):
 		collision_count = get_parent().get_nomi_collision_count()
 	AchievementManager.check_perfect_race(finish_position, collision_count)
+	AchievementManager.check_comeback(
+		RaceManager.registered_cars.size(),
+		RaceManager.car_was_last.get(car, false),
+		finish_position
+	)
 
 	# Season mode: show standings button (positions recorded later when race fully ends)
 	if GameManager.season_active and season_standings_btn:

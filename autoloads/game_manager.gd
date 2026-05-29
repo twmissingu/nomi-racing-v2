@@ -449,12 +449,12 @@ func go_to_race() -> void:
 		transition_to_scene("res://scenes/race/race_scene.tscn")
 
 func get_selected_car_data() -> Resource:
-	if selected_car_index < CAR_PATHS.size():
+	if selected_car_index >= 0 and selected_car_index < CAR_PATHS.size():
 		return load(CAR_PATHS[selected_car_index])
 	return load(CAR_PATHS[0])
 
 func get_p2_car_data() -> Resource:
-	if p2_car_index < CAR_PATHS.size():
+	if p2_car_index >= 0 and p2_car_index < CAR_PATHS.size():
 		return load(CAR_PATHS[p2_car_index])
 	return load(CAR_PATHS[0])
 
@@ -471,7 +471,7 @@ func get_track_data(index: int) -> Resource:
 	return null
 
 func get_selected_track_data() -> Resource:
-	if selected_track_index < TRACK_PATHS.size():
+	if selected_track_index >= 0 and selected_track_index < TRACK_PATHS.size():
 		return load(TRACK_PATHS[selected_track_index])
 	return load(TRACK_PATHS[0])
 
