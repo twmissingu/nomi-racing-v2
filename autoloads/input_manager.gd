@@ -98,6 +98,8 @@ func _add_joy_button_action(action_name: String, button: JoyButton, device: int)
 func _add_joy_axis_action(action_name: String, axis: JoyAxis, deadzone_threshold: float, device: int) -> void:
 	if not InputMap.has_action(action_name):
 		InputMap.add_action(action_name, abs(deadzone_threshold))
+	else:
+		InputMap.action_set_deadzone(action_name, abs(deadzone_threshold))
 	var event := InputEventJoypadMotion.new()
 	event.axis = axis
 	event.axis_value = sign(deadzone_threshold)
