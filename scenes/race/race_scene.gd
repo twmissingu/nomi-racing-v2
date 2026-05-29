@@ -29,16 +29,18 @@ func _ready() -> void:
 	if RaceManager.lap_completed.is_connected(_on_lap_completed):
 		RaceManager.lap_completed.disconnect(_on_lap_completed)
 	_load_track()
+
+	# Setup race state BEFORE spawning cars so AI can read is_point_to_point
+	var track_checkpoints: int = track_node.get_num_checkpoints()
+	var track_data: Resource = GameManager.get_track_data(GameManager.selected_track_index)
+	var is_p2p: bool = track_data.is_point_to_point if track_data else false
+	RaceManager.setup_race(GameManager.race_laps, track_checkpoints, is_p2p)
+
 	_spawn_player()
 	_spawn_ai_cars()
 	_setup_camera()
 	_wire_collision_shake()
 	_setup_ui()
-
-	var track_checkpoints: int = track_node.get_num_checkpoints()
-	var track_data: Resource = GameManager.get_track_data(GameManager.selected_track_index)
-	var is_p2p: bool = track_data.is_point_to_point if track_data else false
-	RaceManager.setup_race(GameManager.race_laps, track_checkpoints, is_p2p)
 
 	# Set open_path for point-to-point tracks
 	if is_p2p:
