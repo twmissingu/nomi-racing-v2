@@ -146,7 +146,7 @@ func _build_ui() -> void:
 				var winner: Dictionary = sorted_drivers[0]
 				if winner.car_index == GameManager.season_player_car_index:
 					champ_label.text = "YOU ARE THE %s CHAMPION!" % season_title
-						AchievementManager.check_season_win()
+					AchievementManager.check_season_win()
 				else:
 					var winner_name: String = GameManager.get_team_name(winner.car_index)
 					champ_label.text = "%s WINS THE %s" % [winner_name.to_upper(), season_title]
