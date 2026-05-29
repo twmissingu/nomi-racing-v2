@@ -175,3 +175,7 @@ func check_nio_collection(owned_cars: Array[int]) -> void:
 
 func check_season_win() -> void:
 	unlock("season_champion")
+
+func check_drift(duration_seconds: float) -> void:
+	if duration_seconds >= 10.0:
+		unlock("drift_king")

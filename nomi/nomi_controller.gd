@@ -22,6 +22,7 @@ var last_position: int = 1
 var last_lap: int = 0
 var was_drifting: bool = false
 var collision_count: int = 0
+var drift_total: float = 0.0
 
 # Configuration
 const COMMENT_COOLDOWN: float = 3.5
@@ -53,6 +54,7 @@ func set_player_car(car: VehicleBody3D) -> void:
 func start_race() -> void:
 	current_state = NOMIState.NAVIGATING
 	state_timer = 0.0
+	drift_total = 0.0
 	expression_changed.emit("happy")
 	# Race start comment
 	comment_cooldown = COMMENT_COOLDOWN
@@ -62,7 +64,7 @@ func start_race() -> void:
 func _process_idle(_delta: float) -> void:
 	pass
 
-func _process_navigating(_delta: float) -> void:
+func _process_navigating(delta: float) -> void:
 	if not player_car or not race_manager:
 		return
 
@@ -83,12 +85,15 @@ func _process_navigating(_delta: float) -> void:
 			_comment_on_lap(current_lap)
 		last_lap = current_lap
 
-	# Check for drifting
-	if player_car.is_drifting and not was_drifting:
-		if comment_cooldown <= 0.0 and randf() < DRIFT_COMMENT_CHANCE:
-			_comment_on_drift()
-		was_drifting = true
-	elif not player_car.is_drifting:
+	# Check for drifting — track duration and trigger commentary
+	if player_car.is_drifting:
+		drift_total += delta
+		AchievementManager.check_drift(drift_total)
+		if not was_drifting:
+			if comment_cooldown <= 0.0 and randf() < DRIFT_COMMENT_CHANCE:
+				_comment_on_drift()
+			was_drifting = true
+	else:
 		was_drifting = false
 
 	# Check for high speed
