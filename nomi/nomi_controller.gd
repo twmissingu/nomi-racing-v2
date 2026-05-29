@@ -23,6 +23,7 @@ var last_lap: int = 0
 var was_drifting: bool = false
 var collision_count: int = 0
 var drift_total: float = 0.0
+var best_lap_time: float = 0.0
 
 # Configuration
 const COMMENT_COOLDOWN: float = 3.5
@@ -55,6 +56,7 @@ func start_race() -> void:
 	current_state = NOMIState.NAVIGATING
 	state_timer = 0.0
 	drift_total = 0.0
+	best_lap_time = 0.0
 	expression_changed.emit("happy")
 	# Race start comment
 	comment_cooldown = COMMENT_COOLDOWN
@@ -139,6 +141,14 @@ func _comment_overtaken(new_pos: int) -> void:
 func _comment_on_lap(lap: int) -> void:
 	comment_cooldown = COMMENT_COOLDOWN
 	_change_state(NOMIState.COMMENTING)
+
+	# Check for fastest lap
+	var lap_time: float = race_manager.get_car_last_lap_time(player_car)
+	if lap_time > 0.0 and (best_lap_time <= 0.0 or lap_time < best_lap_time):
+		best_lap_time = lap_time
+		expression_changed.emit("celebrating")
+		commentary_requested.emit(NOMICommentary.get_fastest_lap_comment(), 3.0)
+		return
 
 	var total_laps: int = race_manager.total_laps
 	if lap >= total_laps:

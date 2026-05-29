@@ -138,12 +138,27 @@ static func build(parent: Node3D, car_data: Resource, wheels: Array) -> Standard
 	accent.material = accent_mat
 	parent.add_child(accent)
 
-	# --- Rear spoiler for ET5 ---
+	# ET7 gets a premium roof accent strip
+	if is_et7:
+		var roof_accent := CSGBox3D.new()
+		roof_accent.name = "RoofAccent"
+		roof_accent.size = Vector3(0.04, 0.02, body_len * 0.35)
+		roof_accent.position = Vector3(0, 1.23, -0.1)
+		roof_accent.use_collision = false
+		roof_accent.material = accent_mat
+		parent.add_child(roof_accent)
+
+	# --- Rear spoiler ---
 	if car_data.rear_spoiler:
+		# ET7 gets a larger, more aggressive spoiler
+		var spoiler_width: float = car_data.body_width * 0.75 if is_et7 else car_data.body_width * 0.6
+		var spoiler_height: float = 0.06 if is_et7 else 0.04
+		var spoiler_y: float = 0.92 if is_et7 else 0.85
+
 		var spoiler := CSGBox3D.new()
 		spoiler.name = "Spoiler"
-		spoiler.size = Vector3(car_data.body_width * 0.6, 0.04, 0.2)
-		spoiler.position = Vector3(0, 0.85, body_len * 0.4)
+		spoiler.size = Vector3(spoiler_width, spoiler_height, 0.22)
+		spoiler.position = Vector3(0, spoiler_y, body_len * 0.4)
 		spoiler.use_collision = false
 		spoiler.material = body_mat
 		parent.add_child(spoiler)
