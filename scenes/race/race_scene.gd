@@ -259,6 +259,11 @@ func _on_lap_completed(car: Node, _lap: int) -> void:
 	if car == player_car:
 		SoundManager.play_lap_complete()
 
+func get_nomi_collision_count() -> int:
+	if nomi_controller and nomi_controller.has_method("get_collision_count"):
+		return nomi_controller.get_collision_count()
+	return 0
+
 func _on_race_finished(car: Node) -> void:
 	if car != player_car:
 		return

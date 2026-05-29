@@ -196,6 +196,13 @@ func show_results(car: Node, finish_position: int = 1) -> void:
 	var total_races: int = SaveManager.profile.race_history.size()
 	AchievementManager.check_race_complete(finish_position, total_races)
 	AchievementManager.check_speed(car.current_speed_kph if "current_speed_kph" in car else 0.0)
+	# Perfect race: win without collisions
+	var collision_count: int = 0
+	if "collision_count" in car:
+		collision_count = car.collision_count
+	elif get_parent().has_method("get_nomi_collision_count"):
+		collision_count = get_parent().get_nomi_collision_count()
+	AchievementManager.check_perfect_race(finish_position, collision_count)
 
 	# Season mode: show standings button (positions recorded later when race fully ends)
 	if GameManager.season_active and season_standings_btn:

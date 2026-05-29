@@ -5,6 +5,7 @@ extends Node
 signal achievement_unlocked(achievement_id: String, name: String)
 
 var unlocked_achievements: Array[String] = []
+var _podium_count: int = 0
 
 # Achievement definitions
 const ACHIEVEMENTS := {
@@ -81,14 +82,25 @@ func _load_achievements() -> void:
 			var text: String = file.get_as_text()
 			file.close()
 			var json := JSON.new()
-			if json.parse(text) == OK and json.data is Array:
+			if json.parse(text) == OK and json.data is Dictionary:
+				if "unlocked" in json.data and json.data.unlocked is Array:
+					for id in json.data.unlocked:
+						unlocked_achievements.append(str(id))
+				if "podium_count" in json.data:
+					_podium_count = int(json.data.podium_count)
+			elif json.parse(text) == OK and json.data is Array:
+				# Legacy format: just an array of IDs
 				for id in json.data:
 					unlocked_achievements.append(str(id))
 
 func _save_achievements() -> void:
+	var data := {
+		"unlocked": unlocked_achievements,
+		"podium_count": _podium_count,
+	}
 	var file := FileAccess.open("user://achievements.json", FileAccess.WRITE)
 	if file:
-		file.store_string(JSON.stringify(unlocked_achievements))
+		file.store_string(JSON.stringify(data))
 		file.close()
 
 func unlock(achievement_id: String) -> void:
@@ -134,6 +146,18 @@ func check_race_complete(finish_position: int, total_races: int) -> void:
 		unlock("first_win")
 	if total_races >= 10:
 		unlock("niwu_changke")
+	if finish_position <= 3:
+		_podium_count += 1
+		if _podium_count >= 20:
+			unlock("podium_master")
+
+func check_perfect_race(finish_position: int, collision_count: int) -> void:
+	if finish_position == 1 and collision_count == 0:
+		unlock("perfect_race")
+
+func check_comeback(total_cars: int, was_last: bool, finish_position: int) -> void:
+	if was_last and finish_position == 1:
+		unlock("comeback_king")
 
 func check_speed(speed_kph: float) -> void:
 	if speed_kph >= 300.0:
