@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="CarData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://cars/car_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+car_name = "NIO ES7"
+tier = 5
+price = 0
+description = "NIO's flagship electric SUV. Dual-motor AWD with 653hp and air suspension. Comfort meets performance."
+max_speed_kph = 200.0
+drive_type = 2
+mass_kg = 2400.0
+torque_low_rpm = 5200.0
+torque_peak_rpm = 5500.0
+torque_high_rpm = 4200.0
+drag_coefficient = 0.32
+downforce_coefficient = 0.08
+brake_force = 48.0
+brake_bias = 0.62
+weight_transfer_factor = 0.12
+drift_friction_slip = 1.6
+drift_steer_multiplier = 1.4
+normal_friction_slip = 2.8
+suspension_rest_length = 0.28
+suspension_stiffness = 40.0
+suspension_travel = 0.22
+damping_compression = 1.4
+damping_relaxation = 1.8
+wheel_radius = 0.38
+max_steering_angle = 0.36
+body_color = Color(0.0, 0.63, 0.88, 1)
+secondary_color = Color(0.0, 0.44, 0.62, 1)
+body_width = 2.0
+body_length = 4.9
+body_height = 0.75
+cabin_height = 0.7
+cabin_offset_z = 0.0
+hood_scoop = false
+rear_spoiler = false
+spoiler_height = 0.0
