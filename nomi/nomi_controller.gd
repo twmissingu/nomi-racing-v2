@@ -151,10 +151,10 @@ func _comment_on_lap(lap: int) -> void:
 		return
 
 	var total_laps: int = race_manager.total_laps
-	if lap >= total_laps:
+	if lap == total_laps - 1:
 		expression_changed.emit("surprised")
 		commentary_requested.emit(NOMICommentary.get_final_lap_comment(), 3.0)
-	else:
+	elif lap < total_laps:
 		expression_changed.emit("happy")
 		commentary_requested.emit(NOMICommentary.get_lap_complete_comment(), 3.0)
 
