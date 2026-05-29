@@ -240,10 +240,16 @@ func _car_finish(car: Node) -> void:
 func _finish_race_timeout() -> void:
 	# Assign remaining positions to unfinished cars based on current progress
 	_update_positions()
-	# Mark all remaining cars as finished so finish_order is complete
+	# Sort remaining cars by their progress-based position so _car_finish assigns correct sequential positions
+	var remaining: Array = []
 	for car in registered_cars:
 		if not car_finished.get(car, false):
-			_car_finish(car)
+			remaining.append(car)
+	remaining.sort_custom(func(a: Node, b: Node) -> bool:
+		return car_positions.get(a, 999) < car_positions.get(b, 999)
+	)
+	for car in remaining:
+		_car_finish(car)
 	state = RaceState.FINISHED
 	race_state_changed.emit(RaceState.FINISHED)
 
