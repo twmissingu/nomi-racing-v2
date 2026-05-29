@@ -1,30 +1,49 @@
-# Velocity
+[![English](https://img.shields.io/badge/English-blue.svg)](README.md)
+[![中文](https://img.shields.io/badge/中文-red.svg)](README_zh.md)
 
-A Forza-style 3D racing game built in Godot 4.6.1 with GDScript. All geometry is procedurally generated — no imported 3D models.
+---
+
+# Velocity — NOMI Racing
+
+A Forza-style 3D racing game with an AI co-pilot named NOMI, built entirely in Godot 4.6.3 with GDScript. All geometry is procedurally generated — zero imported 3D models.
+
+## Why This Project?
+
+Velocity isn't just another racing game — it's a complete racing simulation with personality. The NOMI AI assistant comments on your driving in real-time, celebrates your victories, and reacts to your collisions. Five distinct racing modes span from street circuits to desert rally stages, each with its own physics feel and championship season.
+
+Every car, track, and mesh is built procedurally from CSG primitives and ArrayMesh, making the entire game self-contained with no external asset dependencies.
 
 ## Features
 
-- **4 Racing Modes:** Street (GT), Formula 1, Baja Desert Rally, NASCAR
-- **42 Cars** across 7 vehicle types (sedan, coupe, muscle, F1, stock car, buggy, trophy truck) — all procedurally generated meshes
-- **14 Tracks** — ovals, street circuits, mountain roads, point-to-point desert stages, and superspeedways
-- **Full Season Championships** for each mode with authentic points systems
-- **AI Opponents** with 3 difficulty levels and rubber-banding
-- **Split-Screen Multiplayer** (2 players)
-- **Garage & Progression** — earn credits, unlock cars
-- **HUD** with position, lap counter, speed, minimap, throttle/brake indicators
-- **DRS System** for F1 mode, slipstream drafting
+- **5 Racing Modes:** Street (GT), Formula 1, Baja Desert Rally, NASCAR, NIO
+- **46 Cars** across 11 vehicle types — including 4 NIO models (ES7, ET5, ET7, EP9)
+- **14 Tracks** — ovals, street circuits, mountain roads, point-to-point desert stages, superspeedways
+- **NOMI AI Co-Pilot** — real-time commentary, expressions, drift tracking, victory celebrations
+- **Full Season Championships** for each mode with authentic points systems (FIA, NASCAR, SCORE)
+- **AI Opponents** with 3 difficulty levels, rubber-banding, and obstacle avoidance
+- **Split-Screen Multiplayer** (2 players, independent HUDs)
+- **Garage & Progression** — earn credits, unlock cars, 12 achievements
+- **Advanced Physics** — 120Hz VehicleBody3D, weight transfer, drift model, slipstream, DRS
+- **Procedural Audio** — engine, drift, collision, and UI sounds generated at runtime
 
-## Requirements
+## Quick Start
 
-- [Godot 4.6.1](https://godotengine.org/download)
+### Prerequisites
 
-## Running
+- [Godot 4.6.3+](https://godotengine.org/download) (Windows, macOS, or Linux)
 
-Open the project in Godot or run from the command line:
+### Run
 
 ```bash
-godot --path /path/to/racing-game
+# Clone
+git clone git@github.com:twmissingu/nomi-racing-v2.git
+cd nomi-racing-v2
+
+# Launch
+godot --path .
 ```
+
+Or open the project folder in the Godot editor and press F5.
 
 ## Controls
 
@@ -37,10 +56,47 @@ godot --path /path/to/racing-game
 | R | Reset car |
 | ESC | Pause |
 
-Split-screen Player 2 uses Arrow Keys + Numpad.
+Gamepad supported: Right trigger (throttle), Left trigger (brake), Left stick (steering).
 
-## Architecture
+Split-screen Player 2: Arrow Keys + Numpad.
 
-The game uses Godot's VehicleBody3D physics at 120Hz with four singleton autoloads (InputManager, SaveManager, GameManager, RaceManager). Cars use a composition pattern — controllers (player or AI) are added as child nodes. All track geometry is generated procedurally in `_ready()` using ArrayMesh and CSG primitives.
+## For AI Agents
 
-See [CLAUDE.md](CLAUDE.md) for detailed technical documentation.
+This project is designed for seamless AI agent interaction:
+
+```bash
+# Clone and enter
+git clone git@github.com:twmissingu/nomi-racing-v2.git
+cd nomi-racing-v2
+
+# Headless validation (no display needed)
+/opt/homebrew/bin/godot --headless --path . --quit
+
+# Run the game
+/opt/homebrew/bin/godot --path .
+```
+
+**Key architecture:**
+- 4 autoloads: `InputManager`, `SaveManager`, `GameManager`, `RaceManager` (load order matters)
+- All UI built in GDScript code (no .tscn UI scenes)
+- Cars use composition: controllers as child nodes of VehicleBody3D
+- Tracks generate geometry in `_ready()` via ArrayMesh + CSG
+- Physics at 120Hz for VehicleBody3D stability
+
+See [CLAUDE.md](CLAUDE.md) for full technical documentation.
+
+## Project Structure
+
+```
+autoloads/          # InputManager, SaveManager, GameManager, RaceManager
+cars/               # CarBase, controllers, 46 car definitions, 11 mesh builders
+tracks/             # TrackData, 14 track scenes, checkpoint system
+scenes/             # Race orchestrator, split-screen, camera, countdown, results
+ui/                 # Main menu, garage, track select, race setup, HUD, pause, settings, season
+nomi/               # NOMI controller, HUD avatar, commentary system
+data/               # Player profile, race result structures
+```
+
+## License
+
+[MIT](LICENSE)
