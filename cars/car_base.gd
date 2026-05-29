@@ -199,10 +199,7 @@ func _apply_braking() -> void:
 		wheel_rr.wheel_friction_slip = car_data.drift_friction_slip * 0.5
 		brake = car_data.brake_force * 0.3
 	elif brake_input > 0.0:
-		var total_brake: float = car_data.brake_force * brake_input
-		var front_brake: float = total_brake * car_data.brake_bias
-		var rear_brake: float = total_brake * (1.0 - car_data.brake_bias)
-		brake = (front_brake + rear_brake) * 0.5
+		brake = car_data.brake_force * brake_input
 	else:
 		brake = 0.0
 
