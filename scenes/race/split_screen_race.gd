@@ -18,6 +18,7 @@ var is_paused: bool = false
 var _just_unpaused: bool = false
 
 var players_results_shown: Array[bool] = [false, false]
+var results_screen_shown: bool = false
 
 func _ready() -> void:
 	Engine.time_scale = 1.0
@@ -59,6 +60,7 @@ func _ready() -> void:
 
 	RaceManager.race_finished.connect(_on_race_finished)
 	RaceManager.race_state_changed.connect(_on_race_state_changed)
+	RaceManager.lap_completed.connect(_on_lap_completed)
 
 	await get_tree().create_timer(0.5).timeout
 	RaceManager.start_countdown()
@@ -252,17 +254,20 @@ func _toggle_pause() -> void:
 	is_paused = true
 
 func _on_race_finished(car: Node) -> void:
-	# Show results when P1 finishes (P1 is the "main" player for results/saving)
-	if car == player_cars[0]:
-		_show_results_for_player(0)
-	elif car == player_cars[1]:
-		_show_results_for_player(1)
+	# Show results for whichever player finishes first
+	if car == player_cars[0] or car == player_cars[1]:
+		var idx: int = 0 if car == player_cars[0] else 1
+		_show_results_for_player(idx)
+
+func _on_lap_completed(car: Node, _lap: int) -> void:
+	SoundManager.play_lap_complete()
 
 func _on_race_state_changed(new_state: int) -> void:
 	if new_state == RaceManager.RaceState.FINISHED:
-		# Show results for any player that hasn't been shown yet
-		if not players_results_shown[0]:
-			_show_results_for_player(0)
+		# Show results for any player that hasn't finished yet (timeout case)
+		for i in range(2):
+			if not players_results_shown[i]:
+				_show_results_for_player(i)
 
 func _wire_collision_shake() -> void:
 	for i in range(2):
@@ -298,8 +303,9 @@ func _show_results_for_player(player_idx: int) -> void:
 		controller.set_physics_process(false)
 	car.set_inputs(0.0, 0.0, 0.0, false)
 
-	# Show shared results when P1 finishes (or on timeout)
-	if player_idx == 0:
+	# Show results for the first player to finish
+	if not results_screen_shown:
+		results_screen_shown = true
 		_start_slow_motion()
 		var finish_pos: int = RaceManager.get_finish_position(car)
 		results_screen.show_results(car, finish_pos)
