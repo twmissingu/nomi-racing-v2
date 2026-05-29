@@ -310,6 +310,7 @@ func advance_season() -> void:
 	season_current_round += 1
 	var calendar: Array = get_season_calendar()
 	if season_current_round >= calendar.size():
+		end_season()
 		return
 	_start_season_round()
 
