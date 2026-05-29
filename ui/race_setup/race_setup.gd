@@ -97,7 +97,7 @@ func _build_ui() -> void:
 		max_laps = 50
 	_create_spinner(panel, "LAPS", 50, laps_value, 1, max_laps, func(v: int): laps_value = v; _update_display())
 	laps_row = panel.get_child(panel.get_child_count() - 1) as HBoxContainer
-	laps_label = laps_row.get_child(1) as Label
+	laps_label = laps_row.get_meta("value_label") as Label
 
 	# Hide laps for point-to-point tracks
 	var track_data_check: Resource = GameManager.get_selected_track_data()
@@ -112,11 +112,13 @@ func _build_ui() -> void:
 		GameManager.RacingMode.BAJA: max_ai = 5
 		GameManager.RacingMode.NASCAR: max_ai = 19
 	_create_spinner(panel, "AI OPPONENTS", 150, ai_count_value, 0, max_ai, func(v: int): ai_count_value = v; _update_display())
-	ai_label = panel.get_child(panel.get_child_count() - 1).get_child(1) as Label
+	var ai_row: HBoxContainer = panel.get_child(panel.get_child_count() - 1) as HBoxContainer
+	ai_label = ai_row.get_meta("value_label") as Label
 
 	# Difficulty spinner
 	_create_spinner(panel, "DIFFICULTY", 250, difficulty_value, 0, 2, func(v: int): difficulty_value = v; _update_display(), true)
-	difficulty_label = panel.get_child(panel.get_child_count() - 1).get_child(1) as Label
+	var diff_row: HBoxContainer = panel.get_child(panel.get_child_count() - 1) as HBoxContainer
+	difficulty_label = diff_row.get_meta("value_label") as Label
 
 	# Summary
 	summary_label = Label.new()
@@ -192,6 +194,9 @@ func _create_spinner(parent: Control, label_text: String, y_pos: float, initial:
 			value_label.text = str(state[0])
 		on_change.call(state[0])
 	)
+
+	# Store references on the row for external access
+	row.set_meta("value_label", value_label)
 
 func _update_display() -> void:
 	var car_data: Resource = GameManager.get_selected_car_data()
