@@ -121,14 +121,14 @@ func _generate_track_points() -> Array[Dictionary]:
 		var p2: Vector3 = _wp_to_vec3(waypoints[p2_idx])
 		var p3: Vector3 = _wp_to_vec3(waypoints[p3_idx])
 
-		# Mark the race end (start of first run-off segment)
-		if seg == race_wp_count - 1:
-			race_end_index = points.size()
-
 		for i in range(steps_per_seg):
 			var t: float = float(i) / float(steps_per_seg)
 			var pos: Vector3 = _catmull_rom(p0, p1, p2, p3, t)
 			points.append({"position": pos, "forward": Vector3.ZERO, "banking": 0.0})
+
+		# Mark the race end after the last race segment's points are generated
+		if seg == race_wp_count - 1:
+			race_end_index = points.size()
 
 	# Add final waypoint
 	points.append({"position": _wp_to_vec3(waypoints[wp_count - 1]), "forward": Vector3.ZERO, "banking": 0.0})
