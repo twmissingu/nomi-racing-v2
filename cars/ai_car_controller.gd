@@ -92,7 +92,16 @@ func _physics_process(delta: float) -> void:
 			car.set_inputs(0.0, 1.0, 0.0, false)
 			return
 
-	var speed_kph: float = car.current_speed_kph
+	# Compute signed forward speed — negative means car is moving backward
+	var local_vel: Vector3 = car.global_transform.basis.inverse() * car.linear_velocity
+	var forward_speed: float = -local_vel.z * 3.6
+	var speed_kph: float = absf(forward_speed)
+
+	# If facing backward, brake and steer to correct direction
+	if forward_speed < -5.0:
+		car.set_inputs(0.0, 1.0, signf(lateral_offset), false)
+		return
+
 	var max_speed: float = car.car_data.max_speed_kph * speed_factor * rubber_band_multiplier
 
 	var speed_ratio: float = clampf(speed_kph / max_speed, 0.0, 1.0)
