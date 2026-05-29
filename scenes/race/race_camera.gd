@@ -85,14 +85,14 @@ func _physics_process(delta: float) -> void:
 		look_at(global_position + smoothed_forward, Vector3.UP)
 
 	# Speed-based FOV
-	if target.has_method("get") and "current_speed_kph" in target:
+	if "current_speed_kph" in target:
 		var speed_ratio: float = clampf(target.current_speed_kph / 300.0, 0.0, 1.0)
 		var target_fov: float = lerpf(base_fov, max_fov, speed_ratio)
 		current_fov = lerpf(current_fov, target_fov, fov_smoothing * delta)
 		fov = current_fov
 
 	# Steering tilt
-	if target.has_method("get") and "steering_input" in target:
+	if "steering_input" in target:
 		var target_tilt: float = -target.steering_input * tilt_amount
 		current_tilt = lerpf(current_tilt, target_tilt, tilt_smoothing * delta)
 		rotation_degrees.z = current_tilt
